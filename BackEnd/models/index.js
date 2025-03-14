@@ -24,13 +24,19 @@ const User = sequelize.define(
   }
 );
 
-const Store = sequelize.define("Store", {
-  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-  name: { type: DataTypes.STRING, allowNull: false },
-  email: { type: DataTypes.STRING, allowNull: false, unique: true },
-  address: { type: DataTypes.STRING(400), allowNull: false },
-  owner_id: { type: DataTypes.INTEGER, allowNull: false },
-});
+const Store = sequelize.define(
+  "Store",
+  {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    name: { type: DataTypes.STRING, allowNull: false },
+    email: { type: DataTypes.STRING, allowNull: false, unique: true },
+    address: { type: DataTypes.STRING(400), allowNull: false },
+    owner_id: { type: DataTypes.INTEGER, allowNull: false },
+  },
+  {
+    timestamps: true,
+  }
+);
 
 const Rating = sequelize.define("Rating", {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
@@ -46,8 +52,8 @@ const Rating = sequelize.define("Rating", {
 User.hasMany(Store, { foreignKey: "owner_id" });
 Store.belongsTo(User, { foreignKey: "owner_id" });
 
-User.hasMany(Rating, { foreignKey: "user_id" });
-Store.hasMany(Rating, { foreignKey: "store_id" });
+User.hasMany(Rating, { foreignKey: "user_id", onDelte: "CASCADE" });
+Store.hasMany(Rating, { foreignKey: "store_id", onDelte: "CASCADE" });
 
 Rating.belongsTo(User, { foreignKey: "user_id" });
 Rating.belongsTo(Store, { foreignKey: "store_id" });
