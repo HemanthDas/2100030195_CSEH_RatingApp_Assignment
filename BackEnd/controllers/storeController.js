@@ -1,5 +1,5 @@
-const { Store } = require("../models/index");
-
+const { Store, Rating } = require("../models/index");
+const { Op, Sequelize } = require("sequelize");
 exports.createStore = async (req, res) => {
   try {
     const { name, email, address, owner_id } = req.body;
@@ -15,6 +15,39 @@ exports.getStores = async (req, res) => {
     const stores = await Store.findAll();
     res.json(stores);
   } catch (error) {
+    res.status(500).json({ message: "Error retrieving stores", error });
+  }
+};
+exports.getStores = async (req, res) => {
+  try {
+    const { name, email, address } = req.query;
+
+    let filter = {};
+    if (name) filter.name = { [Op.like]: `%${name}%` };
+    if (email) filter.email = { [Op.like]: `%${email}%` };
+    if (address) filter.address = { [Op.like]: `%${address}%` };
+
+    const stores = await Store.findAll({
+      where: filter,
+      attributes: [
+        "id",
+        "name",
+        "email",
+        "address",
+        [Sequelize.fn("AVG", Sequelize.col("Ratings.rating")), "avgRating"],
+      ],
+      include: [
+        {
+          model: Rating,
+          attributes: [],
+        },
+      ],
+      group: ["Store.id"],
+    });
+
+    res.json(stores);
+  } catch (error) {
+    console.log(error);
     res.status(500).json({ message: "Error retrieving stores", error });
   }
 };

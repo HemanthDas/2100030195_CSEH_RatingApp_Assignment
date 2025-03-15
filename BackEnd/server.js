@@ -4,9 +4,11 @@ const authRoutes = require("./routes/authRoutes");
 const storeRoutes = require("./routes/storeRoutes");
 const ratingRoutes = require("./routes/ratingRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const cors = require("cors");
 require("dotenv").config();
 
 const app = express();
+app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
