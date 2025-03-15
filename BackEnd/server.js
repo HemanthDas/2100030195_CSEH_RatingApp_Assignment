@@ -3,6 +3,7 @@ const { sequelize } = require("./models");
 const authRoutes = require("./routes/authRoutes");
 const storeRoutes = require("./routes/storeRoutes");
 const ratingRoutes = require("./routes/ratingRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 require("dotenv").config();
 
 const app = express();
@@ -12,6 +13,7 @@ app.use(express.json());
 app.use("/auth", authRoutes);
 app.use("/stores", storeRoutes);
 app.use("/rating", ratingRoutes);
+app.use("/admin", adminRoutes);
 const PORT = process.env.PORT || 3000;
 
 sequelize
