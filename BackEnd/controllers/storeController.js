@@ -1,12 +1,42 @@
-const { Store, Rating } = require("../models/index");
+const { Store, Rating, User } = require("../models/index");
 const { Op, Sequelize } = require("sequelize");
 exports.createStore = async (req, res) => {
   try {
-    const { name, email, address, owner_id } = req.body;
+    const {
+      name,
+      email,
+      address,
+      ownerId,
+      ownerName,
+      ownerEmail,
+      ownerPassword,
+    } = req.body;
 
-    const store = await Store.create({ name, email, address, owner_id });
-    res.status(201).json({ message: "Store created successfully", store });
+    let storeOwner = await User.findByPk(ownerId);
+
+    if (!storeOwner && ownerName && ownerEmail && ownerPassword) {
+      storeOwner = await User.create({
+        name: ownerName,
+        email: ownerEmail,
+        password_hash: ownerPassword,
+        address: address,
+        role: "store_owner",
+      });
+    }
+
+    if (!storeOwner) {
+      return res.status(400).json({ message: "Store owner is required." });
+    }
+    const store = await Store.create({
+      name,
+      email,
+      address,
+      owner_id: storeOwner.dataValues.id,
+    });
+
+    res.status(201).json(store);
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: "Error creating store", error });
   }
 };

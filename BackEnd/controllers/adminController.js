@@ -1,3 +1,4 @@
+const { Op } = require("sequelize");
 const { User, Store, Rating, sequelize } = require("../models/index");
 
 exports.getDashboardStats = async (req, res) => {
@@ -15,7 +16,6 @@ exports.getDashboardStats = async (req, res) => {
     });
     res.json({ totalUsers, totalStores, totalRatings, storeRatings });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Error fetching dashboard stats", error });
   }
 };
@@ -32,6 +32,7 @@ exports.getUsers = async (req, res) => {
     const users = await User.findAll({ where: filter });
     res.json(users);
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: "Error fetching users", error });
   }
 };
