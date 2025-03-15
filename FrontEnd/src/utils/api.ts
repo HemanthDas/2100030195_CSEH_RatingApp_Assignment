@@ -19,10 +19,10 @@ export async function fetcher<T>(
     logout();
     throw new Error("Unauthorized - Please login again.");
   }
-
+  const res = await response.json();
   if (!response.ok) {
-    throw new Error(`API Error: ${response.statusText}`);
+    throw new Error(res.message);
   }
 
-  return response.json();
+  return res;
 }

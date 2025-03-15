@@ -18,7 +18,7 @@ import { Route as AuthLoginImport } from './routes/auth/login'
 import { Route as AdminDashboardImport } from './routes/admin/dashboard'
 import { Route as AdminAddUserImport } from './routes/admin/addUser'
 import { Route as AdminAddStoreImport } from './routes/admin/addStore'
-import { Route as AdminUserUserImport } from './routes/admin/user/$user'
+import { Route as AdminUserUseridImport } from './routes/admin/user/$userid'
 
 // Create/Update Routes
 
@@ -64,9 +64,9 @@ const AdminAddStoreRoute = AdminAddStoreImport.update({
   getParentRoute: () => AdminRoute,
 } as any)
 
-const AdminUserUserRoute = AdminUserUserImport.update({
-  id: '/user/$user',
-  path: '/user/$user',
+const AdminUserUseridRoute = AdminUserUseridImport.update({
+  id: '/user/$userid',
+  path: '/user/$userid',
   getParentRoute: () => AdminRoute,
 } as any)
 
@@ -123,11 +123,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthSignupImport
       parentRoute: typeof rootRoute
     }
-    '/admin/user/$user': {
-      id: '/admin/user/$user'
-      path: '/user/$user'
-      fullPath: '/admin/user/$user'
-      preLoaderRoute: typeof AdminUserUserImport
+    '/admin/user/$userid': {
+      id: '/admin/user/$userid'
+      path: '/user/$userid'
+      fullPath: '/admin/user/$userid'
+      preLoaderRoute: typeof AdminUserUseridImport
       parentRoute: typeof AdminImport
     }
   }
@@ -139,14 +139,14 @@ interface AdminRouteChildren {
   AdminAddStoreRoute: typeof AdminAddStoreRoute
   AdminAddUserRoute: typeof AdminAddUserRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
-  AdminUserUserRoute: typeof AdminUserUserRoute
+  AdminUserUseridRoute: typeof AdminUserUseridRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAddStoreRoute: AdminAddStoreRoute,
   AdminAddUserRoute: AdminAddUserRoute,
   AdminDashboardRoute: AdminDashboardRoute,
-  AdminUserUserRoute: AdminUserUserRoute,
+  AdminUserUseridRoute: AdminUserUseridRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
@@ -159,7 +159,7 @@ export interface FileRoutesByFullPath {
   '/admin/dashboard': typeof AdminDashboardRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
-  '/admin/user/$user': typeof AdminUserUserRoute
+  '/admin/user/$userid': typeof AdminUserUseridRoute
 }
 
 export interface FileRoutesByTo {
@@ -170,7 +170,7 @@ export interface FileRoutesByTo {
   '/admin/dashboard': typeof AdminDashboardRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
-  '/admin/user/$user': typeof AdminUserUserRoute
+  '/admin/user/$userid': typeof AdminUserUseridRoute
 }
 
 export interface FileRoutesById {
@@ -182,7 +182,7 @@ export interface FileRoutesById {
   '/admin/dashboard': typeof AdminDashboardRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
-  '/admin/user/$user': typeof AdminUserUserRoute
+  '/admin/user/$userid': typeof AdminUserUseridRoute
 }
 
 export interface FileRouteTypes {
@@ -195,7 +195,7 @@ export interface FileRouteTypes {
     | '/admin/dashboard'
     | '/auth/login'
     | '/auth/signup'
-    | '/admin/user/$user'
+    | '/admin/user/$userid'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -205,7 +205,7 @@ export interface FileRouteTypes {
     | '/admin/dashboard'
     | '/auth/login'
     | '/auth/signup'
-    | '/admin/user/$user'
+    | '/admin/user/$userid'
   id:
     | '__root__'
     | '/'
@@ -215,7 +215,7 @@ export interface FileRouteTypes {
     | '/admin/dashboard'
     | '/auth/login'
     | '/auth/signup'
-    | '/admin/user/$user'
+    | '/admin/user/$userid'
   fileRoutesById: FileRoutesById
 }
 
@@ -258,7 +258,7 @@ export const routeTree = rootRoute
         "/admin/addStore",
         "/admin/addUser",
         "/admin/dashboard",
-        "/admin/user/$user"
+        "/admin/user/$userid"
       ]
     },
     "/admin/addStore": {
@@ -279,8 +279,8 @@ export const routeTree = rootRoute
     "/auth/signup": {
       "filePath": "auth/signup.tsx"
     },
-    "/admin/user/$user": {
-      "filePath": "admin/user/$user.tsx",
+    "/admin/user/$userid": {
+      "filePath": "admin/user/$userid.tsx",
       "parent": "/admin"
     }
   }

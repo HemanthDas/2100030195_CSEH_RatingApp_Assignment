@@ -31,55 +31,63 @@ function RouteComponent() {
         method: "POST",
         body: JSON.stringify(form),
       });
+
       toast.success("User added successfully!");
-      queryClient.invalidateQueries({ queryKey: ["users"] }); // Refresh user list
+      queryClient.invalidateQueries({ queryKey: ["users"] });
     } catch (error) {
-      console.error(error);
-      toast.error("Failed to add user.");
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("An unknown error occurred");
+      }
     }
   };
 
   return (
-    <div className="mt-6 p-4 border rounded-lg bg-gray-100">
-      <h2 className="text-lg font-bold">Add New User</h2>
-      <form onSubmit={handleSubmit} className="flex gap-4 mt-2">
-        <input
-          className="input"
-          type="text"
-          name="name"
-          placeholder="Full Name"
-          onChange={handleChange}
-          required
-        />
-        <input
-          className="input"
-          type="email"
-          name="email"
-          placeholder="Email"
-          onChange={handleChange}
-          required
-        />
-        <input
-          className="input"
-          type="password"
-          name="password"
-          placeholder="Password"
-          onChange={handleChange}
-          required
-        />
-        <input
-          className="input"
-          type="text"
-          name="address"
-          placeholder="Address"
-          onChange={handleChange}
-          required
-        />
-        <select className="input" name="role" onChange={handleChange}>
-          <option value="user">User</option>
-          <option value="admin">Admin</option>
-        </select>
-        <button className="bg-green-500 text-white px-4 py-2 rounded">
+    <div className="max-w-md mx-auto mt-10 bg-white shadow-lg rounded-lg p-6">
+      <h2 className="text-2xl font-bold mb-4 text-center">Add New User</h2>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {[
+          { label: "Full Name", name: "name", type: "text" },
+          { label: "Email", name: "email", type: "email" },
+          { label: "Password", name: "password", type: "password" },
+          {
+            label: "Address (Street, City, State, Postal Code)",
+            name: "address",
+            type: "text",
+          },
+        ].map(({ label, name, type }) => (
+          <div key={name} className="flex flex-col">
+            <label className="mb-1 font-medium" htmlFor={name}>
+              {label}
+            </label>
+            <input
+              className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              type={type}
+              name={name}
+              id={name}
+              autoComplete="off"
+              placeholder={label}
+              onChange={handleChange}
+              required
+            />
+          </div>
+        ))}
+        <div className="flex flex-col">
+          <label className="mb-1 font-medium" htmlFor="role">
+            Role
+          </label>
+          <select
+            className="border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            name="role"
+            id="role"
+            onChange={handleChange}
+          >
+            <option value="user">User</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+        <button className="w-full bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition">
           Add User
         </button>
       </form>

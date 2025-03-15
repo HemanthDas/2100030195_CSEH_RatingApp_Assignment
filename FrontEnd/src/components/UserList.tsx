@@ -3,74 +3,74 @@ import { fetcher } from "../utils/api";
 import { useState } from "react";
 
 interface User {
-    id: number;
-    name: string;
-    email: string;
-    address: string;
-    role: "admin" | "user" | "store_owner";
+  id: number;
+  name: string;
+  email: string;
+  address: string;
+  role: "admin" | "user" | "store_owner";
 }
 
 export default function UserList() {
-    const [filters, setFilters] = useState({ name: "", email: "", role: "" });
+  const [filters, setFilters] = useState({ name: "", email: "", role: "" });
 
-    const {
-        data: users,
-        isLoading,
-        error,
-    } = useQuery<User[]>({
-        queryKey: ["users", filters],
-        queryFn: () =>
-            fetcher<User[]>(
-                `/admin/users?name=${filters.name}&email=${filters.email}&role=${filters.role}`
-            ),
-    });
+  const {
+    data: users,
+    isLoading,
+    error,
+  } = useQuery<User[]>({
+    queryKey: ["users", filters],
+    queryFn: () =>
+      fetcher<User[]>(
+        `/admin/users?name=${filters.name}&email=${filters.email}&role=${filters.role}`
+      ),
+  });
 
-    return (
-        <div className="mt-6">
-            <h2 className="text-xl font-bold mb-4">Users</h2>
-            <div className="flex gap-4 mb-4">
-                <input
-                    className="border p-2 rounded"
-                    placeholder="Search by Name"
-                    onChange={(e) => setFilters({ ...filters, name: e.target.value })}
-                />
-                <input
-                    className="border p-2 rounded"
-                    placeholder="Search by Email"
-                    onChange={(e) => setFilters({ ...filters, email: e.target.value })}
-                />
-                <select
-                    className="border p-2 rounded"
-                    onChange={(e) => setFilters({ ...filters, role: e.target.value })}
-                >
-                    <option value="">All Roles</option>
-                    <option value="admin">Admin</option>
-                    <option value="user">User</option>
-                    <option value="store_owner">Store Owner</option>
-                </select>
-            </div>
+  return (
+    <div className="mt-6 p-4 bg-white shadow-md rounded-l">
+      <h2 className="text-2xl font-bold mb-4">Users</h2>
+      <div className="flex gap-4 mb-4">
+        <input
+          className="border p-2 rounded"
+          placeholder="Search by Name"
+          onChange={(e) => setFilters({ ...filters, name: e.target.value })}
+        />
+        <input
+          className="border p-2 rounded"
+          placeholder="Search by Email"
+          onChange={(e) => setFilters({ ...filters, email: e.target.value })}
+        />
+        <select
+          className="border p-2 rounded"
+          onChange={(e) => setFilters({ ...filters, role: e.target.value })}
+        >
+          <option value="">All Roles</option>
+          <option value="admin">Admin</option>
+          <option value="user">User</option>
+          <option value="store_owner">Store Owner</option>
+        </select>
+      </div>
 
-            {isLoading && <p>Loading...</p>}
-            {error && <p>Error: {error.message}</p>}
+      {isLoading && <p>Loading...</p>}
+      {error && <p>Error: {error.message}</p>}
 
-            <table className="w-full border-collapse border border-gray-300">
-                <thead>
-                    <tr className="bg-gray-100">
-                        <th className="border p-2">Name</th>
-                        <th className="border p-2">Email</th>
-                        <th className="border p-2">Role</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {users?.map((user) => (
-                        <tr key={user.id} className="border-b">
-                            <td className="border p-2">{user.name}</td>
-                            <td className="border p-2">{user.email}</td>
-                            <td className="border p-2">{user.role}</td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
-    );
+      <table className="w-full border-collapse border border-gray-300">
+        <thead>
+          <tr className="bg-gray-100">
+            <th className="border p-2">Name</th>
+            <th className="border p-2">Email</th>
+            <th className="border p-2">Role</th>
+          </tr>
+        </thead>
+        <tbody>
+          {users?.map((user) => (
+            <tr key={user.id} className="border-b">
+              <td className="border p-2">{user.name}</td>
+              <td className="border p-2">{user.email}</td>
+              <td className="border p-2">{user.role}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
 }
