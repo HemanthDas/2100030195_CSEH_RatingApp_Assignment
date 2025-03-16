@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { fetcher } from "../../utils/api";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { AuthContext } from "../../context/AuthContext";
 
 export const Route = createFileRoute("/auth/signup")({
   component: RouteComponent,
@@ -8,6 +9,7 @@ export const Route = createFileRoute("/auth/signup")({
 
 function RouteComponent() {
   const navigate = useNavigate();
+  const { user } = useContext(AuthContext)!;
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -15,7 +17,15 @@ function RouteComponent() {
     password: "",
   });
   const [error, setError] = useState<string | null>(null);
-
+  useEffect(() => {
+    if (user) {
+      if (user.role === "user") {
+        navigate({ to: "/dashboard" });
+      } else if (user.role === "store_owner") {
+        navigate({ to: "/owner/dashboard" });
+      }
+    }
+  }, [user, navigate]);
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };

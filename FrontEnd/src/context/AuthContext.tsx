@@ -17,6 +17,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 function AuthProvider({ children }: { readonly children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [tokenChecked, setTokenChecked] = useState(false);
 
   const logout = () => {
     localStorage.removeItem("token");
@@ -24,18 +25,29 @@ function AuthProvider({ children }: { readonly children: ReactNode }) {
   };
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      const decoded = jwtDecode<User & { exp: number }>(token);
-      const currentTime = Math.floor(Date.now() / 1000);
-
-      if (decoded.exp < currentTime) {
-        console.warn("Token expired. Logging out...");
-        logout();
-      } else {
-        setUser({ id: decoded.id, role: decoded.role });
+    const checkToken = async () => {
+      const token = localStorage.getItem("token");
+      if (token) {
+        try {
+          const decoded = jwtDecode<User & { exp: number }>(token);
+          const currentTime = Math.floor(Date.now() / 1000);
+          if (decoded.exp < currentTime) {
+            console.warn("Token expired. Logging out...");
+            localStorage.removeItem("token");
+            setTimeout(() => setUser(null), 0);
+          } else {
+            setUser({ id: decoded.userId, role: decoded.role });
+          }
+        } catch (error) {
+          console.error("Invalid token:", error);
+          localStorage.removeItem("token");
+          setTimeout(() => setUser(null), 0);
+        }
       }
-    }
+      setTokenChecked(true);
+    };
+
+    checkToken();
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
@@ -59,7 +71,11 @@ function AuthProvider({ children }: { readonly children: ReactNode }) {
 
   const value = useMemo(() => ({ user, login, logout }), [user]);
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      {tokenChecked ? children : null}
+    </AuthContext.Provider>
+  );
 }
 
 export { AuthProvider, AuthContext };

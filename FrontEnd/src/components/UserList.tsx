@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetcher } from "../utils/api";
 import { useState } from "react";
+import { Link } from "@tanstack/react-router";
 
 interface User {
   id: number;
@@ -64,7 +65,17 @@ export default function UserList() {
         <tbody>
           {users?.map((user) => (
             <tr key={user.id} className="border-b">
-              <td className="border p-2">{user.name}</td>
+              <td className="border p-2">
+                <Link
+                  to={`/admin/user/$userid`.replace(
+                    "$userid",
+                    user.id.toString()
+                  )}
+                  className="text-blue-500 hover:underline"
+                >
+                  {user.name}
+                </Link>
+              </td>
               <td className="border p-2">{user.email}</td>
               <td className="border p-2">{user.role}</td>
             </tr>

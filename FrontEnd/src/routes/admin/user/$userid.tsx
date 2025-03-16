@@ -1,5 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute, useParams } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  useParams,
+  useNavigate,
+} from "@tanstack/react-router";
 import { fetcher } from "../../../utils/api";
 
 export const Route = createFileRoute("/admin/user/$userid")({
@@ -15,6 +19,7 @@ interface User {
 }
 function RouteComponent() {
   const { userid } = useParams({ strict: false });
+  const navigate = useNavigate();
 
   const {
     data: user,
@@ -25,32 +30,49 @@ function RouteComponent() {
     queryFn: () => fetcher<User>(`/admin/users/${userid}`),
   });
 
-  if (isLoading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error.message}</p>;
+  if (isLoading) return <p className="text-center text-gray-500">Loading...</p>;
+  if (error)
+    return <p className="text-center text-red-500">Error: {error.message}</p>;
 
   return (
-    <div className="p-6">
-      {user ? (
-        <>
-          <h1 className="text-3xl font-bold">{user.name}</h1>
-          <p>
-            <strong>Email:</strong> {user.email}
-          </p>
-          <p>
-            <strong>Address:</strong> {user.address}
-          </p>
-          <p>
-            <strong>Role:</strong> {user.role}
-          </p>
-          {user.role === "store_owner" && (
-            <p>
-              <strong>Average Rating:</strong> {user.rating ?? "No ratings yet"}
-            </p>
+    <div className="flex flex-col items-center justify-center min-h-screen relative">
+      <button
+        onClick={() => navigate({ to: "/admin/dashboard" })}
+        className="absolute top-4 left-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
+      >
+        Back
+      </button>
+      <div className="p-6 max-w-3xl mx-auto">
+        <div className="bg-white shadow-md rounded-lg p-6">
+          {user ? (
+            <>
+              <h1 className="text-3xl font-bold mb-4">{user.name}</h1>
+              <div className="mb-2">
+                <strong className="block text-gray-700">Email:</strong>
+                <span className="text-gray-900">{user.email}</span>
+              </div>
+              <div className="mb-2">
+                <strong className="block text-gray-700">Address:</strong>
+                <span className="text-gray-900">{user.address}</span>
+              </div>
+              <div className="mb-2">
+                <strong className="block text-gray-700">Role:</strong>
+                <span className="text-gray-900">{user.role}</span>
+              </div>
+              {user.role === "store_owner" && (
+                <div className="mb-2">
+                  <strong className="block text-gray-700">Average Rating:</strong>
+                  <span className="text-gray-900">
+                    {user.rating ?? "No ratings yet"}
+                  </span>
+                </div>
+              )}
+            </>
+          ) : (
+            <p className="text-center text-gray-500">No user data available</p>
           )}
-        </>
-      ) : (
-        <p>No user data available</p>
-      )}
+        </div>
+      </div>
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
 
 export const Route = createFileRoute("/auth/login")({
@@ -7,9 +7,17 @@ export const Route = createFileRoute("/auth/login")({
 });
 
 function RouteComponent() {
-  const { login } = useContext(AuthContext)!;
+  const { login, user } = useContext(AuthContext)!;
   const navigate = useNavigate();
-
+  useEffect(() => {
+    if (user) {
+      if (user.role === "user") {
+        navigate({ to: "/dashboard" });
+      } else if (user.role === "store_owner") {
+        navigate({ to: "/owner/dashboard" });
+      }
+    }
+  }, [user, navigate]);
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState<string | null>(null);
 

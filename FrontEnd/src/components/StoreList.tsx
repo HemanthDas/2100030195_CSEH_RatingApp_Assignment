@@ -9,6 +9,7 @@ interface Store {
   address: string;
   avgRating: number | null;
 }
+
 export default function StoreList() {
   const [filters, setFilters] = useState({ name: "", email: "", address: "" });
 
@@ -60,18 +61,21 @@ export default function StoreList() {
           </tr>
         </thead>
         <tbody>
-          {stores?.map((store) => (
-            <tr key={store.id} className="border-b">
-              <td className="border p-2">{store.name}</td>
-              <td className="border p-2">{store.email}</td>
-              <td className="border p-2">{store.address}</td>
-              <td className="border p-2">
-                {store.avgRating !== null
-                  ? store.avgRating.toFixed(1)
-                  : "No ratings yet"}
-              </td>
-            </tr>
-          ))}
+          {stores?.map((store) => {
+            const rating = Number(store.avgRating);
+            return (
+              <tr key={store.id} className="border-b">
+                <td className="border p-2">{store.name}</td>
+                <td className="border p-2">{store.email}</td>
+                <td className="border p-2">{store.address}</td>
+                <td className="border p-2">
+                  {isNaN(rating) || rating === 0
+                    ? "No ratings yet"
+                    : rating.toFixed(1)}
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>

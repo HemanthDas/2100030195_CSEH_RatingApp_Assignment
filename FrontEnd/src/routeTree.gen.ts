@@ -11,16 +11,35 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as OwnerImport } from './routes/owner'
+import { Route as DashboardImport } from './routes/dashboard'
 import { Route as AdminImport } from './routes/admin'
 import { Route as IndexImport } from './routes/index'
+import { Route as DashboardIndexImport } from './routes/dashboard/index'
+import { Route as OwnerDashboardImport } from './routes/owner/dashboard'
 import { Route as AuthSignupImport } from './routes/auth/signup'
 import { Route as AuthLoginImport } from './routes/auth/login'
+import { Route as AuthChangepasswordImport } from './routes/auth/changepassword'
 import { Route as AdminDashboardImport } from './routes/admin/dashboard'
 import { Route as AdminAddUserImport } from './routes/admin/addUser'
 import { Route as AdminAddStoreImport } from './routes/admin/addStore'
+import { Route as DashboardStoreAllstoresImport } from './routes/dashboard/store/allstores'
+import { Route as DashboardStoreIdImport } from './routes/dashboard/store/$id'
 import { Route as AdminUserUseridImport } from './routes/admin/user/$userid'
 
 // Create/Update Routes
+
+const OwnerRoute = OwnerImport.update({
+  id: '/owner',
+  path: '/owner',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const DashboardRoute = DashboardImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const AdminRoute = AdminImport.update({
   id: '/admin',
@@ -34,6 +53,18 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const DashboardIndexRoute = DashboardIndexImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardRoute,
+} as any)
+
+const OwnerDashboardRoute = OwnerDashboardImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => OwnerRoute,
+} as any)
+
 const AuthSignupRoute = AuthSignupImport.update({
   id: '/auth/signup',
   path: '/auth/signup',
@@ -43,6 +74,12 @@ const AuthSignupRoute = AuthSignupImport.update({
 const AuthLoginRoute = AuthLoginImport.update({
   id: '/auth/login',
   path: '/auth/login',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const AuthChangepasswordRoute = AuthChangepasswordImport.update({
+  id: '/auth/changepassword',
+  path: '/auth/changepassword',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -62,6 +99,18 @@ const AdminAddStoreRoute = AdminAddStoreImport.update({
   id: '/addStore',
   path: '/addStore',
   getParentRoute: () => AdminRoute,
+} as any)
+
+const DashboardStoreAllstoresRoute = DashboardStoreAllstoresImport.update({
+  id: '/store/allstores',
+  path: '/store/allstores',
+  getParentRoute: () => DashboardRoute,
+} as any)
+
+const DashboardStoreIdRoute = DashboardStoreIdImport.update({
+  id: '/store/$id',
+  path: '/store/$id',
+  getParentRoute: () => DashboardRoute,
 } as any)
 
 const AdminUserUseridRoute = AdminUserUseridImport.update({
@@ -88,6 +137,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminImport
       parentRoute: typeof rootRoute
     }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardImport
+      parentRoute: typeof rootRoute
+    }
+    '/owner': {
+      id: '/owner'
+      path: '/owner'
+      fullPath: '/owner'
+      preLoaderRoute: typeof OwnerImport
+      parentRoute: typeof rootRoute
+    }
     '/admin/addStore': {
       id: '/admin/addStore'
       path: '/addStore'
@@ -109,6 +172,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminDashboardImport
       parentRoute: typeof AdminImport
     }
+    '/auth/changepassword': {
+      id: '/auth/changepassword'
+      path: '/auth/changepassword'
+      fullPath: '/auth/changepassword'
+      preLoaderRoute: typeof AuthChangepasswordImport
+      parentRoute: typeof rootRoute
+    }
     '/auth/login': {
       id: '/auth/login'
       path: '/auth/login'
@@ -123,12 +193,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthSignupImport
       parentRoute: typeof rootRoute
     }
+    '/owner/dashboard': {
+      id: '/owner/dashboard'
+      path: '/dashboard'
+      fullPath: '/owner/dashboard'
+      preLoaderRoute: typeof OwnerDashboardImport
+      parentRoute: typeof OwnerImport
+    }
+    '/dashboard/': {
+      id: '/dashboard/'
+      path: '/'
+      fullPath: '/dashboard/'
+      preLoaderRoute: typeof DashboardIndexImport
+      parentRoute: typeof DashboardImport
+    }
     '/admin/user/$userid': {
       id: '/admin/user/$userid'
       path: '/user/$userid'
       fullPath: '/admin/user/$userid'
       preLoaderRoute: typeof AdminUserUseridImport
       parentRoute: typeof AdminImport
+    }
+    '/dashboard/store/$id': {
+      id: '/dashboard/store/$id'
+      path: '/store/$id'
+      fullPath: '/dashboard/store/$id'
+      preLoaderRoute: typeof DashboardStoreIdImport
+      parentRoute: typeof DashboardImport
+    }
+    '/dashboard/store/allstores': {
+      id: '/dashboard/store/allstores'
+      path: '/store/allstores'
+      fullPath: '/dashboard/store/allstores'
+      preLoaderRoute: typeof DashboardStoreAllstoresImport
+      parentRoute: typeof DashboardImport
     }
   }
 }
@@ -151,38 +249,84 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
+interface DashboardRouteChildren {
+  DashboardIndexRoute: typeof DashboardIndexRoute
+  DashboardStoreIdRoute: typeof DashboardStoreIdRoute
+  DashboardStoreAllstoresRoute: typeof DashboardStoreAllstoresRoute
+}
+
+const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardIndexRoute: DashboardIndexRoute,
+  DashboardStoreIdRoute: DashboardStoreIdRoute,
+  DashboardStoreAllstoresRoute: DashboardStoreAllstoresRoute,
+}
+
+const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
+  DashboardRouteChildren,
+)
+
+interface OwnerRouteChildren {
+  OwnerDashboardRoute: typeof OwnerDashboardRoute
+}
+
+const OwnerRouteChildren: OwnerRouteChildren = {
+  OwnerDashboardRoute: OwnerDashboardRoute,
+}
+
+const OwnerRouteWithChildren = OwnerRoute._addFileChildren(OwnerRouteChildren)
+
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/dashboard': typeof DashboardRouteWithChildren
+  '/owner': typeof OwnerRouteWithChildren
   '/admin/addStore': typeof AdminAddStoreRoute
   '/admin/addUser': typeof AdminAddUserRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/auth/changepassword': typeof AuthChangepasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/owner/dashboard': typeof OwnerDashboardRoute
+  '/dashboard/': typeof DashboardIndexRoute
   '/admin/user/$userid': typeof AdminUserUseridRoute
+  '/dashboard/store/$id': typeof DashboardStoreIdRoute
+  '/dashboard/store/allstores': typeof DashboardStoreAllstoresRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/owner': typeof OwnerRouteWithChildren
   '/admin/addStore': typeof AdminAddStoreRoute
   '/admin/addUser': typeof AdminAddUserRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/auth/changepassword': typeof AuthChangepasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/owner/dashboard': typeof OwnerDashboardRoute
+  '/dashboard': typeof DashboardIndexRoute
   '/admin/user/$userid': typeof AdminUserUseridRoute
+  '/dashboard/store/$id': typeof DashboardStoreIdRoute
+  '/dashboard/store/allstores': typeof DashboardStoreAllstoresRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/dashboard': typeof DashboardRouteWithChildren
+  '/owner': typeof OwnerRouteWithChildren
   '/admin/addStore': typeof AdminAddStoreRoute
   '/admin/addUser': typeof AdminAddUserRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/auth/changepassword': typeof AuthChangepasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/owner/dashboard': typeof OwnerDashboardRoute
+  '/dashboard/': typeof DashboardIndexRoute
   '/admin/user/$userid': typeof AdminUserUseridRoute
+  '/dashboard/store/$id': typeof DashboardStoreIdRoute
+  '/dashboard/store/allstores': typeof DashboardStoreAllstoresRoute
 }
 
 export interface FileRouteTypes {
@@ -190,38 +334,61 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/dashboard'
+    | '/owner'
     | '/admin/addStore'
     | '/admin/addUser'
     | '/admin/dashboard'
+    | '/auth/changepassword'
     | '/auth/login'
     | '/auth/signup'
+    | '/owner/dashboard'
+    | '/dashboard/'
     | '/admin/user/$userid'
+    | '/dashboard/store/$id'
+    | '/dashboard/store/allstores'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/admin'
+    | '/owner'
     | '/admin/addStore'
     | '/admin/addUser'
     | '/admin/dashboard'
+    | '/auth/changepassword'
     | '/auth/login'
     | '/auth/signup'
+    | '/owner/dashboard'
+    | '/dashboard'
     | '/admin/user/$userid'
+    | '/dashboard/store/$id'
+    | '/dashboard/store/allstores'
   id:
     | '__root__'
     | '/'
     | '/admin'
+    | '/dashboard'
+    | '/owner'
     | '/admin/addStore'
     | '/admin/addUser'
     | '/admin/dashboard'
+    | '/auth/changepassword'
     | '/auth/login'
     | '/auth/signup'
+    | '/owner/dashboard'
+    | '/dashboard/'
     | '/admin/user/$userid'
+    | '/dashboard/store/$id'
+    | '/dashboard/store/allstores'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
+  DashboardRoute: typeof DashboardRouteWithChildren
+  OwnerRoute: typeof OwnerRouteWithChildren
+  AuthChangepasswordRoute: typeof AuthChangepasswordRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthSignupRoute: typeof AuthSignupRoute
 }
@@ -229,6 +396,9 @@ export interface RootRouteChildren {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
+  DashboardRoute: DashboardRouteWithChildren,
+  OwnerRoute: OwnerRouteWithChildren,
+  AuthChangepasswordRoute: AuthChangepasswordRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthSignupRoute: AuthSignupRoute,
 }
@@ -245,6 +415,9 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/admin",
+        "/dashboard",
+        "/owner",
+        "/auth/changepassword",
         "/auth/login",
         "/auth/signup"
       ]
@@ -261,6 +434,20 @@ export const routeTree = rootRoute
         "/admin/user/$userid"
       ]
     },
+    "/dashboard": {
+      "filePath": "dashboard.tsx",
+      "children": [
+        "/dashboard/",
+        "/dashboard/store/$id",
+        "/dashboard/store/allstores"
+      ]
+    },
+    "/owner": {
+      "filePath": "owner.tsx",
+      "children": [
+        "/owner/dashboard"
+      ]
+    },
     "/admin/addStore": {
       "filePath": "admin/addStore.tsx",
       "parent": "/admin"
@@ -273,15 +460,34 @@ export const routeTree = rootRoute
       "filePath": "admin/dashboard.tsx",
       "parent": "/admin"
     },
+    "/auth/changepassword": {
+      "filePath": "auth/changepassword.tsx"
+    },
     "/auth/login": {
       "filePath": "auth/login.tsx"
     },
     "/auth/signup": {
       "filePath": "auth/signup.tsx"
     },
+    "/owner/dashboard": {
+      "filePath": "owner/dashboard.tsx",
+      "parent": "/owner"
+    },
+    "/dashboard/": {
+      "filePath": "dashboard/index.tsx",
+      "parent": "/dashboard"
+    },
     "/admin/user/$userid": {
       "filePath": "admin/user/$userid.tsx",
       "parent": "/admin"
+    },
+    "/dashboard/store/$id": {
+      "filePath": "dashboard/store/$id.tsx",
+      "parent": "/dashboard"
+    },
+    "/dashboard/store/allstores": {
+      "filePath": "dashboard/store/allstores.tsx",
+      "parent": "/dashboard"
     }
   }
 }
