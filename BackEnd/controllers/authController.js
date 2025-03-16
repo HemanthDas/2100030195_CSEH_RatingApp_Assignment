@@ -57,6 +57,7 @@ exports.login = async (req, res) => {
 
 exports.getProfile = async (req, res) => {
   try {
+    console.log(req.user);
     const user = await User.findByPk(req.user.userId, {
       attributes: { exclude: ["password_hash"] },
     });
@@ -65,5 +66,25 @@ exports.getProfile = async (req, res) => {
     res.json(user);
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
+  }
+};
+exports.changePassword = async (req, res) => {
+  try {
+    const { oldPassword, newPassword } = req.body;
+    const userId = req.user.userId;
+
+    const user = await User.findByPk(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const isMatch = await bcrypt.compare(oldPassword, user.password_hash);
+    if (!isMatch)
+      return res.status(400).json({ message: "Old password is incorrect" });
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await user.update({ password_hash: hashedPassword });
+
+    res.json({ message: "Password changed successfully!" });
+  } catch (error) {
+    res.status(500).json({ message: "Error changing password", error });
   }
 };

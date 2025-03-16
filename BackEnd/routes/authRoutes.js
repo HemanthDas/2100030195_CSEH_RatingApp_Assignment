@@ -3,6 +3,7 @@ const {
   register,
   login,
   getProfile,
+  changePassword,
 } = require("../controllers/authController");
 const { authMiddleware } = require("../middlewares/authMiddleware");
 const { body } = require("express-validator");
@@ -25,7 +26,7 @@ router.post(
   ],
   register
 );
-
+router.put("/changepassword", authMiddleware, changePassword);
 router.post("/login", login);
 
 router.get("/profile", authMiddleware, getProfile);

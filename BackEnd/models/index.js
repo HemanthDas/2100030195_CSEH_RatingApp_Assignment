@@ -47,6 +47,10 @@ const Rating = sequelize.define("Rating", {
     allowNull: false,
     validate: { min: 1, max: 5 },
   },
+  comment: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
 });
 
 User.hasMany(Store, { foreignKey: "owner_id" });

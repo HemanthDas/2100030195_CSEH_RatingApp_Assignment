@@ -1,28 +1,64 @@
 const { Rating, Store } = require("../models/index");
 
+exports.getUserRating = async (req, res) => {
+  try {
+    const { storeId } = req.params;
+    const userId = req.user.userId;
+
+    const rating = await Rating.findOne({
+      where: { store_id: storeId, user_id: userId },
+      attributes: ["rating", "comment", "createdAt", "updatedAt"],
+    });
+
+    if (!rating) {
+      return res
+        .status(404)
+        .json({ message: "No rating found for this store" });
+    }
+
+    res.json(rating);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Error retrieving user rating", error });
+  }
+};
 exports.submitRating = async (req, res) => {
   try {
-    const { store_id, rating } = req.body;
+    const { rating, comment } = req.body;
+    const { storeId } = req.params;
+    const userId = req.user.userId;
+
+    if (!rating || rating < 1 || rating > 5) {
+      return res
+        .status(400)
+        .json({ message: "Rating must be between 1 and 5" });
+    }
 
     const existingRating = await Rating.findOne({
-      where: { user_id: req.user.userId, store_id },
+      where: { user_id: userId, store_id: storeId },
     });
+
     if (existingRating) {
-      return res.status(400).json({
-        message:
-          "You have already rated this store. Update your rating instead.",
+      existingRating.rating = rating;
+      existingRating.comment = comment;
+      await existingRating.save();
+      return res.status(200).json({
+        message: "Rating updated successfully",
+        rating: existingRating,
       });
     }
 
     const newRating = await Rating.create({
-      user_id: req.user.userId,
-      store_id,
+      user_id: userId,
+      store_id: storeId,
       rating,
+      comment,
     });
 
-    res
-      .status(201)
-      .json({ message: "Rating submitted successfully", rating: newRating });
+    res.status(201).json({
+      message: "Rating submitted successfully",
+      rating: newRating,
+    });
   } catch (error) {
     res.status(500).json({ message: "Error submitting rating", error });
   }
@@ -30,24 +66,28 @@ exports.submitRating = async (req, res) => {
 
 exports.updateRating = async (req, res) => {
   try {
-    const { rating } = req.body;
-    const { id } = req.params;
+    const { rating, comment } = req.body;
+    const { storeId } = req.params;
+    const userId = req.user.userId;
 
     const userRating = await Rating.findOne({
-      where: { id, user_id: req.user.userId },
+      where: { store_id: storeId, user_id: userId },
     });
+
     if (!userRating) {
       return res.status(404).json({
-        message: "Rating not found or you don't have permission to update it.",
+        message: "You have not rated this store yet. Submit a rating first.",
       });
     }
 
-    await userRating.update({ rating });
+    await userRating.update({ rating, comment });
+
     res.json({ message: "Rating updated successfully", rating: userRating });
   } catch (error) {
     res.status(500).json({ message: "Error updating rating", error });
   }
 };
+
 exports.getStoreRatings = async (req, res) => {
   try {
     const { storeId } = req.params;

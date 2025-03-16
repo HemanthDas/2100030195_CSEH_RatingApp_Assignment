@@ -40,11 +40,41 @@ exports.createStore = async (req, res) => {
     res.status(500).json({ message: "Error creating store", error });
   }
 };
-exports.getStores = async (req, res) => {
+exports.getAllStores = async (req, res) => {
   try {
-    const stores = await Store.findAll();
+    const userId = req.user?.userId || null;
+
+    const stores = await Store.findAll({
+      attributes: [
+        "id",
+        "name",
+        "email",
+        "address",
+        [
+          Sequelize.fn(
+            "COALESCE",
+            Sequelize.fn("AVG", Sequelize.col("Ratings.rating")),
+            0
+          ),
+          "avgRating",
+        ],
+      ],
+      include: [
+        { model: Rating, attributes: [], required: false },
+        {
+          model: Rating,
+          as: "userRating",
+          attributes: ["rating"],
+          where: userId ? { user_id: userId } : undefined,
+          required: false,
+        },
+      ],
+      group: ["Store.id"],
+    });
+
     res.json(stores);
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: "Error retrieving stores", error });
   }
 };
@@ -111,5 +141,29 @@ exports.deleteStore = async (req, res) => {
     res.json({ message: "Store deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: "Error deleting store", error });
+  }
+};
+exports.getUnratedStores = async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit) || 10; // Default: 10 stores
+
+    const stores = await Store.findAll({
+      attributes: ["id", "name", "email", "address"],
+      include: [
+        {
+          model: Rating,
+          attributes: [],
+        },
+      ],
+      where: Sequelize.literal(
+        "(SELECT COUNT(*) FROM Ratings WHERE Ratings.store_id = Store.id) = 0"
+      ),
+      limit,
+    });
+
+    res.json(stores);
+  } catch (error) {
+    console.error("Error retrieving unrated stores:", error);
+    res.status(500).json({ message: "Error retrieving unrated stores", error });
   }
 };
