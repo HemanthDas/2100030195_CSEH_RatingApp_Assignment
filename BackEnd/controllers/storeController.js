@@ -36,7 +36,6 @@ exports.createStore = async (req, res) => {
 
     res.status(201).json(store);
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Error creating store", error });
   }
 };
@@ -74,13 +73,13 @@ exports.getAllStores = async (req, res) => {
 
     res.json(stores);
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Error retrieving stores", error });
   }
 };
 exports.getStores = async (req, res) => {
   try {
-    const { name, email, address } = req.query;
+    const { name, email, address, sort } = req.query;
+    const userId = req.user?.userId || null;
 
     let filter = {};
     if (name) filter.name = { [Op.like]: `%${name}%` };
@@ -94,23 +93,36 @@ exports.getStores = async (req, res) => {
         "name",
         "email",
         "address",
-        [Sequelize.fn("AVG", Sequelize.col("Ratings.rating")), "avgRating"],
+        [Sequelize.fn("AVG", Sequelize.col("Ratings.rating")), "avgRating"], // ✅ Overall rating
+        [
+          Sequelize.literal(
+            `(SELECT rating FROM Ratings WHERE Ratings.store_id = Store.id AND Ratings.user_id = ${userId} LIMIT 1)`
+          ),
+          "userRating",
+        ], // ✅ User's own rating
       ],
       include: [
         {
           model: Rating,
-          attributes: [],
+          attributes: [], // ✅ Only needed for aggregation
         },
       ],
       group: ["Store.id"],
+      order: [
+        [
+          Sequelize.fn("AVG", Sequelize.col("Ratings.rating")),
+          sort === "asc" ? "ASC" : "DESC",
+        ],
+      ],
     });
 
     res.json(stores);
   } catch (error) {
-    console.log(error);
+    console.error("Error retrieving stores:", error);
     res.status(500).json({ message: "Error retrieving stores", error });
   }
 };
+
 exports.getStoreById = async (req, res) => {
   try {
     const store = await Store.findByPk(req.params.id);
@@ -145,25 +157,62 @@ exports.deleteStore = async (req, res) => {
 };
 exports.getUnratedStores = async (req, res) => {
   try {
-    const limit = parseInt(req.query.limit) || 10; // Default: 10 stores
+    const userId = req.user.userId;
 
-    const stores = await Store.findAll({
+    const unratedStores = await Store.findAll({
       attributes: ["id", "name", "email", "address"],
-      include: [
-        {
-          model: Rating,
-          attributes: [],
-        },
-      ],
       where: Sequelize.literal(
         "(SELECT COUNT(*) FROM Ratings WHERE Ratings.store_id = Store.id) = 0"
       ),
-      limit,
+      limit: 5,
     });
 
-    res.json(stores);
+    if (unratedStores.length === 0) {
+      const notRatedByUser = await Store.findAll({
+        attributes: ["id", "name", "email", "address"],
+        where: Sequelize.literal(
+          `(SELECT COUNT(*) FROM Ratings WHERE Ratings.store_id = Store.id AND Ratings.user_id = ${userId}) = 0`
+        ),
+        limit: 5,
+      });
+
+      return res.json(notRatedByUser);
+    }
+
+    res.json(unratedStores);
   } catch (error) {
-    console.error("Error retrieving unrated stores:", error);
-    res.status(500).json({ message: "Error retrieving unrated stores", error });
+    res.status(500).json({ message: "Error fetching unrated stores", error });
+  }
+};
+
+exports.getOwnerStores = async (req, res) => {
+  try {
+    const ownerId = req.user.userId;
+
+    const stores = await Store.findAll({
+      where: { owner_id: ownerId },
+      include: [
+        {
+          model: Rating,
+          include: [{ model: User, attributes: ["id", "name", "email"] }],
+        },
+      ],
+    });
+
+    if (!stores || stores.length === 0) {
+      return res.status(404).json({ message: "You do not own any stores" });
+    }
+
+    const storesWithAvgRating = stores.map((store) => {
+      const avgRating =
+        store.Ratings.length > 0
+          ? store.Ratings.reduce((sum, r) => sum + r.rating, 0) /
+            store.Ratings.length
+          : null;
+      return { ...store.toJSON(), avgRating };
+    });
+    res.json(storesWithAvgRating);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching store details", error });
   }
 };

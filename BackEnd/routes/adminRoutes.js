@@ -21,7 +21,7 @@ router.get(
 router.get("/users", authMiddleware, authorizeRoles("admin"), getUsers);
 router.get("/stores", authMiddleware, authorizeRoles("admin"), getStores);
 router.get(
-  "/users/:id",
+  "/users/:userid",
   authMiddleware,
   authorizeRoles("admin"),
   getUserDetails

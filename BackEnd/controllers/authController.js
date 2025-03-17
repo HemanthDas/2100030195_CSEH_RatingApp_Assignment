@@ -19,7 +19,6 @@ exports.register = async (req, res) => {
     });
     return res.status(201).json({ message: "User created" });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Internal server error", error });
   }
 };
@@ -50,14 +49,12 @@ exports.login = async (req, res) => {
       },
     });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Internal server error", error });
   }
 };
 
 exports.getProfile = async (req, res) => {
   try {
-    console.log(req.user);
     const user = await User.findByPk(req.user.userId, {
       attributes: { exclude: ["password_hash"] },
     });

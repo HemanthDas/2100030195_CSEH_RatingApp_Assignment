@@ -3,7 +3,11 @@ const { Rating, Store } = require("../models/index");
 exports.getUserRating = async (req, res) => {
   try {
     const { storeId } = req.params;
-    const userId = req.user.userId;
+    const userId = req.user?.userId;
+
+    if (!userId) {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
 
     const rating = await Rating.findOne({
       where: { store_id: storeId, user_id: userId },
@@ -18,7 +22,7 @@ exports.getUserRating = async (req, res) => {
 
     res.json(rating);
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({ message: "Error retrieving user rating", error });
   }
 };
@@ -87,7 +91,20 @@ exports.updateRating = async (req, res) => {
     res.status(500).json({ message: "Error updating rating", error });
   }
 };
+exports.getUserStoreRatings = async (req, res) => {
+  try {
+    const ratings = await Rating.findAll({
+      where: { store_id: req.user.userId },
+      include: [{ model: User, attributes: ["id", "name", "email"] }],
+      attributes: ["rating", "comment", "createdAt"],
+      order: [["createdAt", "DESC"]],
+    });
 
+    res.json(ratings);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching store ratings", error });
+  }
+};
 exports.getStoreRatings = async (req, res) => {
   try {
     const { storeId } = req.params;

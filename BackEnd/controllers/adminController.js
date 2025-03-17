@@ -32,7 +32,6 @@ exports.getUsers = async (req, res) => {
     const users = await User.findAll({ where: filter });
     res.json(users);
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Error fetching users", error });
   }
 };
@@ -63,20 +62,45 @@ exports.getStores = async (req, res) => {
     res.status(500).json({ message: "Error fetching stores", error });
   }
 };
-
 exports.getUserDetails = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { userid } = req.params;
 
-    const user = await User.findByPk(id, {
-      attributes: { exclude: ["password_hash"] },
-      include: req.user.role === "admin" ? [{ model: Rating }] : [],
+    // Fetch user details
+    const user = await User.findByPk(userid, {
+      attributes: ["id", "name", "email", "address", "role"],
     });
 
-    if (!user) return res.status(404).json({ message: "User not found" });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
-    res.json(user);
+    // If the user is NOT a store owner, return only personal details
+    if (user.role !== "store_owner") {
+      return res.json(user);
+    }
+
+    // Fetch store & rating details for store owners
+    const stores = await Store.findAll({
+      where: { owner_id: userid },
+      attributes: [
+        "id",
+        "name",
+        "address",
+        [sequelize.fn("AVG", sequelize.col("Ratings.rating")), "avgRating"],
+      ],
+      include: [
+        {
+          model: Rating,
+          attributes: [],
+        },
+      ],
+      group: ["Store.id", "Store.name", "Store.address"],
+    });
+
+    return res.json({ ...user.toJSON(), stores });
   } catch (error) {
-    res.status(500).json({ message: "Error fetching user details", error });
+    console.error(error);
+    res.status(500).json({ message: "Server error", error });
   }
 };

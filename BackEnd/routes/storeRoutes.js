@@ -7,6 +7,7 @@ const {
   deleteStore,
   getUnratedStores,
   getAllStores,
+  getOwnerStores,
 } = require("../controllers/storeController");
 const {
   authMiddleware,
@@ -15,8 +16,14 @@ const {
 
 const router = express.Router();
 
+router.get(
+  "/owner",
+  authMiddleware,
+  authorizeRoles("store_owner"),
+  getOwnerStores
+);
 router.get("/unrated", authMiddleware, getUnratedStores);
-router.get("/", getStores);
+router.get("/", authMiddleware, getStores);
 router.get("/user", authMiddleware, getAllStores);
 router.get("/:id", getStoreById);
 
