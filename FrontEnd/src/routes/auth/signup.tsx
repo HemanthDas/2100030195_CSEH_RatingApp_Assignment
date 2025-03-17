@@ -34,6 +34,28 @@ function RouteComponent() {
     e.preventDefault();
     setError(null);
 
+    // Validation
+    if (form.name.length < 20 || form.name.length > 60) {
+      setError("Name must be between 20 and 60 characters.");
+      return;
+    }
+    if (form.address.length > 400) {
+      setError("Address must be less than 400 characters.");
+      return;
+    }
+    const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,16}$/;
+    if (!passwordRegex.test(form.password)) {
+      setError(
+        "Password must be 8-16 characters, include at least one uppercase letter and one special character."
+      );
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(form.email)) {
+      setError("Invalid email format.");
+      return;
+    }
+
     try {
       await fetcher("/auth/register", {
         method: "POST",

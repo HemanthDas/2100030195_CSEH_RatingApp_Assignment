@@ -39,6 +39,16 @@ function RouteComponent() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Password validation
+    if (form.createNewOwner) {
+      const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,16}$/;
+      if (!passwordRegex.test(form.ownerPassword)) {
+        toast.error("Password must be 8-16 characters, include at least one uppercase letter and one special character.");
+        return;
+      }
+    }
+
     try {
       await fetcher("/stores", {
         method: "POST",
@@ -47,6 +57,17 @@ function RouteComponent() {
 
       toast.success("Store added successfully!");
       queryClient.invalidateQueries({ queryKey: ["stores"] });
+
+      setForm({
+        name: "",
+        email: "",
+        address: "",
+        ownerId: "",
+        createNewOwner: false,
+        ownerName: "",
+        ownerEmail: "",
+        ownerPassword: "",
+      });
     } catch (error) {
       console.error(error);
       toast.error("Failed to add store.");
@@ -80,6 +101,7 @@ function RouteComponent() {
                 id={name}
                 placeholder={label}
                 onChange={handleChange}
+                value={form[name]}
                 required
               />
             </div>
@@ -93,6 +115,7 @@ function RouteComponent() {
                 name="ownerId"
                 id="ownerId"
                 onChange={handleChange}
+                value={form.ownerId}
                 disabled={form.createNewOwner}
                 required={!form.createNewOwner}
               >
@@ -143,6 +166,7 @@ function RouteComponent() {
                     id={name}
                     placeholder={label}
                     onChange={handleChange}
+                    value={form[name]}
                     required
                   />
                 </div>

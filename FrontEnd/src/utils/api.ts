@@ -16,6 +16,7 @@ export async function fetcher<T>(
 
   if (response.status === 401 && logout) {
     console.warn("Unauthorized request. Logging out...");
+
     logout();
     throw new Error("Unauthorized - Please login again.");
   }

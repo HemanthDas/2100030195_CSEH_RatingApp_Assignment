@@ -18,8 +18,9 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 function AuthProvider({ children }: { readonly children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [tokenChecked, setTokenChecked] = useState(false);
-
   const logout = () => {
+    console.warn("Logging out...");
+    console.log("Logging out...");
     localStorage.removeItem("token");
     setUser(null);
   };

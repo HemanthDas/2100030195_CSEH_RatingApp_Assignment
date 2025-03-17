@@ -13,7 +13,7 @@ const UserNavbar = () => {
   return (
     <nav className="p-4 bg-gray-800 text-white flex justify-between items-center">
       <h1 className="text-xl">
-        <Link to="/dashboard">Rating App</Link>
+        <Link to="/owner/dashboard">Rating App</Link>
       </h1>
       {user && (
         <div className="flex space-x-4">

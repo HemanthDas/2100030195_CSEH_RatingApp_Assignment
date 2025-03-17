@@ -12,6 +12,7 @@ export const Route = createFileRoute("/auth/changepassword")({
 function RouteComponent() {
   const [form, setForm] = useState({ oldPassword: "", newPassword: "" });
   const { user } = useContext(AuthContext)!;
+
   useEffect(() => {
     if (!user) {
       navigate({ to: "/auth/login" });
@@ -38,6 +39,8 @@ function RouteComponent() {
         navigate({ to: "/dashboard" });
       } else if (user?.role === "store_owner") {
         navigate({ to: "/owner/dashboard" });
+      } else {
+        navigate({ to: "/admin/dashboard" });
       }
     },
     onError: () => {
@@ -65,7 +68,9 @@ function RouteComponent() {
       <h1 className="text-2xl font-bold mb-4">Change Password</h1>
       <form className="space-y-4" onSubmit={handleSubmit}>
         <div>
-          <label htmlFor="oldPassword" className="block font-medium">Old Password</label>
+          <label htmlFor="oldPassword" className="block font-medium">
+            Old Password
+          </label>
           <input
             id="oldPassword"
             type="password"
@@ -76,7 +81,9 @@ function RouteComponent() {
           />
         </div>
         <div>
-          <label htmlFor="newPassword" className="block font-medium">New Password</label>
+          <label htmlFor="newPassword" className="block font-medium">
+            New Password
+          </label>
           <input
             id="newPassword"
             type="password"

@@ -31,6 +31,12 @@ export default function Navbar() {
             Add Store
           </button>
           <button
+            className="bg-blue-500 px-4 py-2 rounded cursor-pointer"
+            onClick={() => navigate({ to: "/auth/changepassword" })}
+          >
+            Change Password
+          </button>
+          <button
             className="bg-red-500 px-4 py-2 rounded cursor-pointer"
             onClick={handleLogout}
           >
