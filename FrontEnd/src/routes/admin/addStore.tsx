@@ -40,7 +40,6 @@ function RouteComponent() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Password validation
     if (form.createNewOwner) {
       const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,16}$/;
       if (!passwordRegex.test(form.ownerPassword)) {
@@ -142,7 +141,6 @@ function RouteComponent() {
             </label>
           </div>
 
-          {/* New Owner Fields */}
           {form.createNewOwner && (
             <>
               {[

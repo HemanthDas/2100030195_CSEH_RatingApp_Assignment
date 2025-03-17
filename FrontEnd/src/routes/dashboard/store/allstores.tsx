@@ -30,7 +30,7 @@ function RouteComponent() {
     }[]
   >({
     queryKey: ["stores"],
-    queryFn: () => fetcher("/stores"), // Ensure the backend includes 'userRating'
+    queryFn: () => fetcher("/stores"),
   });
   const filteredStores = stores?.filter((store) => {
     const matchesName = store.name
@@ -55,7 +55,6 @@ function RouteComponent() {
         ← Back to Dashboard
       </button>
 
-      {/* ✅ Search Fields */}
       <div className="flex gap-4 mb-4">
         <input
           type="text"
@@ -103,7 +102,6 @@ function RouteComponent() {
                 <StarRating rating={store.avgRating} />
               </div>
 
-              {/* ✅ "Rated ✅" Tag (if user has rated) */}
               {store.userRating !== null && store.userRating !== undefined && (
                 <span className="absolute top-2 right-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center">
                   <FaCheckCircle className="mr-1" /> Rated

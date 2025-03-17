@@ -60,7 +60,6 @@ function RouteComponent() {
               <StarRating rating={store.avgRating} />
             </div>
 
-            {/* Store Ratings */}
             <h3 className="text-xl font-bold mt-4">User Ratings</h3>
             {store.Ratings.length > 0 ? (
               <ul className="space-y-4">
@@ -96,7 +95,6 @@ function RouteComponent() {
   );
 }
 
-// ⭐ Star Rating Component
 function StarRating({ rating }: { rating: number | null }) {
   const validRating = Number(rating) || 0;
   const fullStars = Math.floor(validRating);

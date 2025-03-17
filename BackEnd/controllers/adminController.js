@@ -66,7 +66,6 @@ exports.getUserDetails = async (req, res) => {
   try {
     const { userid } = req.params;
 
-    // Fetch user details
     const user = await User.findByPk(userid, {
       attributes: ["id", "name", "email", "address", "role"],
     });
@@ -75,12 +74,10 @@ exports.getUserDetails = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // If the user is NOT a store owner, return only personal details
     if (user.role !== "store_owner") {
       return res.json(user);
     }
 
-    // Fetch store & rating details for store owners
     const stores = await Store.findAll({
       where: { owner_id: userid },
       attributes: [

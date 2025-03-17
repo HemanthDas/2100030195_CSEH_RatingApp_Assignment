@@ -125,7 +125,6 @@ exports.deleteRating = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Find rating
     const userRating = await Rating.findOne({
       where: { id, user_id: req.user.userId },
     });

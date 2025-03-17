@@ -12,14 +12,14 @@ interface Store {
 
 export default function StoreList() {
   const [filters, setFilters] = useState({ name: "", email: "", address: "" });
-  const [sort, setSort] = useState("desc"); // ✅ Added state for sorting
+  const [sort, setSort] = useState("desc");
 
   const {
     data: stores,
     isLoading,
     error,
   } = useQuery<Store[]>({
-    queryKey: ["stores", filters, sort], // ✅ Added `sort` to query key
+    queryKey: ["stores", filters, sort],
     queryFn: () =>
       fetcher<Store[]>(
         `/stores?name=${filters.name}&email=${filters.email}&address=${filters.address}&sort=${sort}`
@@ -48,7 +48,6 @@ export default function StoreList() {
           onChange={(e) => setFilters({ ...filters, address: e.target.value })}
         />
 
-        {/* ✅ Sorting Dropdown */}
         <select
           className="border p-2 rounded"
           value={sort}
@@ -59,13 +58,11 @@ export default function StoreList() {
         </select>
       </div>
 
-      {/* Loading & Error Handling */}
       {isLoading && <p className="text-center text-gray-500">Loading...</p>}
       {error && (
         <p className="text-center text-red-500">Error: {error.message}</p>
       )}
 
-      {/* Store Table */}
       <table className="w-full border-collapse border border-gray-300">
         <thead>
           <tr className="bg-gray-100">

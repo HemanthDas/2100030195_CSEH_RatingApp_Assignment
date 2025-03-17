@@ -93,18 +93,18 @@ exports.getStores = async (req, res) => {
         "name",
         "email",
         "address",
-        [Sequelize.fn("AVG", Sequelize.col("Ratings.rating")), "avgRating"], // ✅ Overall rating
+        [Sequelize.fn("AVG", Sequelize.col("Ratings.rating")), "avgRating"],
         [
           Sequelize.literal(
             `(SELECT rating FROM Ratings WHERE Ratings.store_id = Store.id AND Ratings.user_id = ${userId} LIMIT 1)`
           ),
           "userRating",
-        ], // ✅ User's own rating
+        ],
       ],
       include: [
         {
           model: Rating,
-          attributes: [], // ✅ Only needed for aggregation
+          attributes: [],
         },
       ],
       group: ["Store.id"],
